@@ -1,7 +1,11 @@
 const express = require("express");
 const client = require("@mailchimp/mailchimp_marketing");
+require("dotenv").config();
 
 const app = express();
+const MAPI_KEY = process.env.API_KEY
+const MLIST_ID = process.env.LIST_ID
+const MAPI_SERVER = process.env.API_SERVER
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.static("public"));
@@ -11,15 +15,15 @@ app.get("/", (req, res) => {
 });
 
 client.setConfig({
-    apiKey: "d07917534b48d60231a7abf6b28050bf-us21",
-    server: "us21"
+  
+    apiKey: MAPI_KEY,
+    server: MAPI_SERVER
   });
 
 app.post("/", (req, res) => {
     const nombre = req.body.nombre;
     const apellido = req.body.apellido;
     const email = req.body.email;
-    const listId = "c73f07bd48";
 
     const subscribingUser = {
         nombre: nombre,
@@ -29,7 +33,7 @@ app.post("/", (req, res) => {
 
     const run = async () => {
         try {  
-            const response = await client.lists.addListMember(listId, {
+            const response = await client.lists.addListMember(MLIST_ID, {
              email_address: subscribingUser.email,
              status: "subscribed",
              merge_fields: {
@@ -54,11 +58,5 @@ app.post("/failure", function(req, res) {
   });
 
 app.listen(process.env.PORT || 3000, () => {
-  console.log("Server running on port 3000");
+  console.log("Server running on port " + process.env.PORT);
 });
-
-//API key
-// d07917534b48d60231a7abf6b28050bf-us21
-
-//list ID
-// c73f07bd48
